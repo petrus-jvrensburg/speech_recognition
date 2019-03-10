@@ -866,7 +866,7 @@ class Recognizer(AudioSource):
         if "transcript" not in best_hypothesis: raise UnknownValueError()
         return best_hypothesis["transcript"]
 
-    def recognize_google_cloud(self, audio_data, credentials_json=None, language="en-US", preferred_phrases=None, show_all=False):
+    def recognize_google_cloud(self, audio_data, credentials_json=None, language="en-US", alternative_languages=None, preferred_phrases=None, show_all=False):
         """
         Performs speech recognition on ``audio_data`` (an ``AudioData`` instance), using the Google Cloud Speech API.
 
@@ -919,7 +919,13 @@ class Recognizer(AudioSource):
         except ImportError:
             raise RequestError("missing google-api-python-client module: ensure that google-api-python-client is set up correctly.")
 
-        speech_config = {"encoding": "FLAC", "sampleRateHertz": audio_data.sample_rate, "languageCode": language}
+        speech_config = {
+            "encoding": "FLAC",
+            "sampleRateHertz": audio_data.sample_rate,
+            "languageCode": language
+        }
+        if alternative_languages is not None:
+            speech_config["alternativeLanguageCodes"] = alternative_languages
         if preferred_phrases is not None:
             speech_config["speechContext"] = {"phrases": preferred_phrases}
         if show_all:
